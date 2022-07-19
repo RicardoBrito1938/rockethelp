@@ -1,4 +1,6 @@
 import {
+  Center,
+  FlatList,
   Heading,
   HStack,
   IconButton,
@@ -11,12 +13,27 @@ import Logo from "../assets/logo_secondary.svg";
 import { Feather } from "@expo/vector-icons";
 import { Filter } from "../components/Filter";
 import { useState } from "react";
+import { Order, OrderProps } from "../components/Order";
+import { Button } from "../components/Button";
+import { ChatTeardrop } from "phosphor-react-native";
 
-export const Home = () => {
+export const Home = ({ navigation }) => {
   const { colors } = useTheme();
   const [statusSelected, setStatusSelected] = useState<"open" | "closed">(
     "open"
   );
+  const [orders, setOrders] = useState<OrderProps[]>([
+    {
+      id: "123",
+      patrimony: "ddddd",
+      when: "18/07/2022 as 10:00",
+      status: "open"
+    }
+  ]);
+
+  const handleNewOrder = () => {
+    navigation.navigate("new");
+  };
 
   return (
     <VStack flex={1} pb={6} bg="gray.700">
@@ -60,6 +77,33 @@ export const Home = () => {
             isActive={statusSelected === "closed"}
           />
         </HStack>
+
+        <FlatList
+          data={orders}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <Order
+              data={item}
+              onPress={() =>
+                navigation.navigate("details", { orderId: item.id })
+              }
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: 100
+          }}
+          ListEmptyComponent={() => (
+            <Center>
+              <ChatTeardrop color={colors.gray[300]} size={40} />
+              <Text color="gray.300" fontSize="xl" mt={6} textAlign="center">
+                You have no requests{"\n"}
+                {statusSelected === "open" ? "open" : "closed"}
+              </Text>
+            </Center>
+          )}
+        />
+        <Button title="New request" onPress={handleNewOrder} />
       </VStack>
     </VStack>
   );
